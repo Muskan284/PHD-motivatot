@@ -14,7 +14,8 @@ from messages import (
     generate_midweek_message,
     generate_start_of_week_message,
 )
-from whatsapp import send_message
+from gifs import random_monday_gif, random_midweek_gif, random_sunday_gif
+from whatsapp import send_message, send_gif
 
 logging.basicConfig(
     level=logging.INFO,
@@ -42,8 +43,8 @@ def _midweek_chosen_day(today: date) -> int:
 @scheduler.scheduled_job(CronTrigger(day_of_week="mon", hour=9, minute=0, timezone=TIMEZONE))
 def start_of_week_job():
     log.info("Running start-of-week job")
-    msg = generate_start_of_week_message()
-    send_message(msg)
+    send_message(generate_start_of_week_message())
+    send_gif(random_monday_gif())
 
 
 @scheduler.scheduled_job(CronTrigger(day_of_week="tue,wed,thu", hour=13, minute=0, timezone=TIMEZONE))
@@ -54,15 +55,15 @@ def midweek_job():
         return
     theme_index = _midweek_theme_index(today)
     log.info("Running midweek job (theme index: %d)", theme_index)
-    msg = generate_midweek_message(theme_index)
-    send_message(msg)
+    send_message(generate_midweek_message(theme_index))
+    send_gif(random_midweek_gif())
 
 
 @scheduler.scheduled_job(CronTrigger(day_of_week="sun", hour=19, minute=0, timezone=TIMEZONE))
 def end_of_week_job():
     log.info("Running end-of-week job")
-    msg = generate_end_of_week_message()
-    send_message(msg)
+    send_message(generate_end_of_week_message())
+    send_gif(random_sunday_gif())
 
 
 if __name__ == "__main__":
